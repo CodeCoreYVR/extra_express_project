@@ -1,15 +1,8 @@
 <%- include("../partials/header") %>
 
-<h1>Sign Up</h1>
-<form action="/users" method="POST">
-  <div class="form-group">
-    <input
-      type="text"
-      class="form-control"
-      name="userName"
-      placeholder="Username">
-  </div>
+<h1>Sign In</h1>
 
+<form action="/session" method="POST">
   <div class="form-group">
     <input
       type="email"
@@ -23,7 +16,8 @@
       type="password"
       class="form-control"
       name="password"
-      placeholder="Password">
+      placeholder="Password"
+    >
   </div>
 
   <input type="submit" value="Submit" class="btn btn-outline-success">

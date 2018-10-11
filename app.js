@@ -5,6 +5,7 @@ const socketIo = require("socket.io");
 const logger = require("morgan");
 const cookieParser = require("cookie-parser");
 const methodOverride = require("method-override");
+const connectRedis = require("connect-redis");
 
 // Require the "express" package returns functions that can
 // to create an instance of an Express app. We build
@@ -14,12 +15,11 @@ const methodOverride = require("method-override");
 const app = express();
 const server = http.Server(app);
 const io = socketIo(server);
-const session = require('express-session');
+const session = require("express-session");
 
 app.set("view engine", "ejs");
 
 // app.set('trust proxy', 1) // trust first proxy
-
 
 // -------------------
 // M I D D L E W A R E
@@ -48,7 +48,6 @@ app.use(logger("dev"));
 // directories from a specified path and serve it all
 // publically on the web.
 app.use(express.static(path.join(__dirname, "public")));
-
 
 // URLENCODED
 
@@ -107,24 +106,37 @@ app.use((request, response, next) => {
   next();
 });
 
-app.use(session({ secret: 'keyboard cat', 
-                  resave: true, 
-                  saveUninitialized: false,
-                  cookie: { secure: false, maxAge: 30 * 24 * 60 * 60 * 1000 }}));
+// SESSION
+
+const RedisStore = connectRedis(session);
+const sessionMiddleware = session({
+  secret: "keyboard cat",
+  // Without a `store`, a Express session is lost on restart, because
+  // by default the session is saved in memory. In this case, we'll
+  // an external db that is extremely fast and is especially tailored
+  // for this purpose, Redis, to store our session.
+  store: new RedisStore({ port: 6379, host: "localhost" }),
+  resave: true,
+  saveUninitialized: false,
+  cookie: { secure: false, maxAge: 30 * 24 * 60 * 60 * 1000 }
+});
+
+app.use(sessionMiddleware);
+
+// CUSTOM USER AUTH. MIDDLEWARE
 
 app.use(async (req, res, next) => {
-
   const { userId } = req.session;
-  
+
   res.locals.currentUser = null;
 
-  if(userId) {
+  if (userId) {
     // fetch user
     try {
       const user = await knex("users")
         .where("id", userId)
         .first();
-  
+
       req.currentUser = user;
       res.locals.currentUser = user; // this makes it accessible in view files
       next();
@@ -154,9 +166,11 @@ app.use(async (req, res, next) => {
 // R O U T E S
 // -----------
 
+const indexRouter = require("./routes/index");
 const welcomeRouter = require("./routes/welcome");
 const postsRouter = require("./routes/posts");
-const usersRouter = require("./routes/users");
+
+app.use("/", indexRouter);
 
 app.use("/", welcomeRouter);
 // You can split routes into their modules with
@@ -166,19 +180,47 @@ app.use("/", welcomeRouter);
 // prefix all of their URLs with /posts.
 app.use("/posts", postsRouter);
 
-app.use("/users", usersRouter);
-
 // -------------
 // S O C K E T S
 // -------------
 const knex = require("./db/client");
 
+// Use Express' session middleware as a Socket.io middleware
+io.use((socket, next) => {
+  // To adapt the Express Session middleware for Socket.io,
+  // we need to pass it the same arguments that Express would pass it
+  // which are in order: the request, the response and a next function.
+  sessionMiddleware(socket.request, socket.request.res, next);
+
+  // The middle will set the session object as a property
+  // of `socket.request`. You'll be able to access it as follows:
+  // socket.request.session
+});
+
+// ...
+io.use(async (socket, next) => {
+  // console.log(socket.request.session);
+  const { userId } = socket.request.session;
+
+  if (userId) {
+    socket.currentUser = await knex("users")
+      .where("id", userId)
+      .first();
+  }
+
+  next();
+});
+
 // .addEventListener
 io.on("connection", socket => {
-  console.log("IO User connected");
+  if (socket.currentUser) {
+    console.log(`| IO | ${socket.currentUser.userName} connected`);
+  }
 
   socket.on("disconnect", reason => {
-    console.log("IO User disconnected");
+    if (socket.currentUser) {
+      console.log(`| IO | ${socket.currentUser.userName} disconnected`);
+    }
   });
 
   socket.on("joinRoom", roomName => {

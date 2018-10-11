@@ -44,23 +44,17 @@
         </ul>
 
         <% if (currentUser) { %>
-          <%= currentUser.userName %>
-        <% } %>
-
-        <% if (username) { %>
           <span class="navbar-text text-light mr-2">
-            👩‍💻 <%= username %>
+            👩‍💻 <%= currentUser.userName %>
           </span>
 
-          <form action="/sign_out" method="POST" class="form-inline">
+          <form action="/session" method="POST" class="form-inline">
+            <input type="hidden" name="_method" value="DELETE">
             <button class="btn btn-outline-light" type="submit">Sign Out</button>
           </form>
         <% } else { %>
-
-          <form action="/sign_in" method="POST" class="form-inline">
-            <input class="form-control mr-2" name="username" placeholder="Username">
-            <button class="btn btn-outline-light" type="submit">Sign In</button>
-          </form>
+          <a href="/session/new" class="btn btn-outline-light mr-2">Sign In</a>
+          <a href="/users/new" class="btn btn-outline-light">Sign Up</a>
         <% } %>
       </div>
     </nav>

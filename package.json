@@ -10,7 +10,8 @@
     "db:migrate": "knex migrate:latest",
     "db:rollback": "knex migrate:rollback",
     "db:seed": "knex seed:run",
-    "db:repl": "psql -d express_demo"
+    "db:repl": "psql -d express_demo",
+    "db:setup": "npm run db:drop && npm run db:create && npm run db:migrate && npm run db:seed"
   },
   "keywords": [
     "server",
@@ -21,6 +22,7 @@
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^3.0.1",
+    "connect-redis": "^3.4.0",
     "cookie-parser": "^1.4.3",
     "ejs": "^2.6.1",
     "express": "^4.16.3",
