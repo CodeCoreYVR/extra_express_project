@@ -5,7 +5,11 @@ const socketIo = require("socket.io");
 const logger = require("morgan");
 const cookieParser = require("cookie-parser");
 const methodOverride = require("method-override");
+const session = require("express-session");
 const connectRedis = require("connect-redis");
+
+// Models
+const User = require("./models/user");
 
 // Require the "express" package returns functions that can
 // to create an instance of an Express app. We build
@@ -15,7 +19,6 @@ const connectRedis = require("connect-redis");
 const app = express();
 const server = http.Server(app);
 const io = socketIo(server);
-const session = require("express-session");
 
 app.set("view engine", "ejs");
 
@@ -133,12 +136,12 @@ app.use(async (req, res, next) => {
   if (userId) {
     // fetch user
     try {
-      const user = await knex("users")
-        .where("id", userId)
-        .first();
+      const user = await User.find(userId);
 
       req.currentUser = user;
       res.locals.currentUser = user; // this makes it accessible in view files
+
+      console.log(user);
       next();
     } catch (error) {
       // If the code above, crashes we're going to take the `error` object and have
@@ -200,9 +203,7 @@ io.use(async (socket, next) => {
   const { userId } = socket.request.session;
 
   if (userId) {
-    socket.currentUser = await knex("users")
-      .where("id", userId)
-      .first();
+    socket.currentUser = await User.find(userId);
   }
 
   next();

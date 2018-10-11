@@ -1,5 +1,4 @@
-const bcrypt = require("bcrypt");
-const knex = require("../db/client");
+const User = require("../models/user");
 
 module.exports = {
   new(req, res) {
@@ -9,16 +8,10 @@ module.exports = {
     const { userName, email, password } = req.body;
 
     try {
-      const passwordDigest = await bcrypt.hash(password, 10);
-      const [id] = await knex("users")
-        .insert({
-          userName,
-          email,
-          passwordDigest
-        })
-        .returning("id");
+      const user = new User({ userName, email, password });
+      await user.save();
 
-      req.session.userId = id;
+      req.session.userId = user.id;
 
       res.redirect("/");
     } catch (error) {

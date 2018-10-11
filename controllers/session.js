@@ -1,5 +1,4 @@
-const bcrypt = require("bcrypt");
-const knex = require("../db/client");
+const User = require("../models/user");
 
 module.exports = {
   new(req, res) {
@@ -9,11 +8,9 @@ module.exports = {
     const { email, password } = req.body;
 
     try {
-      const user = await knex("users")
-        .where("email", email)
-        .first();
+      const user = await User.findByEmail(email);
 
-      if (user && (await bcrypt.compare(password, user.passwordDigest))) {
+      if (user && (await user.authenticate(password))) {
         req.session.userId = user.id;
 
         res.redirect("/");
