@@ -1,0 +1,40 @@
+<%- include("./partials/header") %> 
+
+<h1>Survey</h1>
+
+<!-- When a form is submitted, a HTTP request is made by the browser
+  to the URL written in the "action" attribute with the data
+  from the form. -->
+<form action="/survey/results">
+  <div>
+    <label for="fullName">What is your name?</label> <br />
+    <input type="text" id="fullName" name="fullName">
+  </div>
+
+  <div>
+    <label for="timeOfDay">What is your favourite time of day?</label> <br>
+
+    <% for (let option of ["Morning", "Afternoon", "Evening", "Night"]) { %>
+      <label for="<%= option %>"><%= option %></label>
+      <input type="radio" name="timeOfDay" id="<%= option %>" value="<%= option %>">    
+    <% } %>
+
+    <!--
+    <label for="Morning">Morning</label>
+    <input type="radio" name="timeOfDay" id="Morning" value="Morning">
+    <label for="Afternoon">Afternoon</label>
+    <input type="radio" name="timeOfDay" id="Afternoon" value="Afternoon">
+    <label for="Evening">Evening</label>
+    <input type="radio" name="timeOfDay" id="Evening" value="Evening">
+    -->
+  </div>
+
+  <div>
+    <label for="color">What is your favourite color?</label> <br>
+    <input type="color" name="color" id="color">
+  </div>
+
+  <input type="submit" value="Submit">
+</form>
+
+<%- include("./partials/footer") %>

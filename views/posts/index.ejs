@@ -1,0 +1,13 @@
+<%- include("../partials/header") %>
+  <div class="post-cards">
+    <% for (let post of posts) { %>
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5 class="card-title"><%= post.title %></h5>
+          <p class="card-text"><%= post.content %></p>
+          <a href="/posts/<%= post.id %>" class="card-link text-success">View More</a>
+        </div>
+      </div>
+    <% } %>
+  </div>
+<%- include("../partials/footer") %>

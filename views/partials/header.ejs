@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Express Demo</title>
+
+  <link rel="stylesheet" href="/stylesheets/main.css">
+  <script src="/scripts/main.js"></script>
+
+  <!-- Bootstrap's CSS, Scripts & Dependencies -->
+  <link rel="stylesheet" href="/stylesheets/bootstrap.min.css">
+  <script src="/scripts/jquery-3.3.1.slim.min.js"></script>
+  <script src="/scripts/popper.min.js"></script>
+  <script src="/scripts/bootstrap.min.js"></script>
+
+  <!-- Load Socket.io's client library -->
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+  <header>
+    <nav class="navbar navbar-expand navbar-dark bg-success">
+      <a class="navbar-brand" href="#">Express Demo</a>
+
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Welcome</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/survey">Survey</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/posts/new">New Post</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/posts">Posts</a>
+          </li>
+        </ul>
+
+        <% if (currentUser) { %>
+          <%= currentUser.userName %>
+        <% } %>
+
+        <% if (username) { %>
+          <span class="navbar-text text-light mr-2">
+            👩‍💻 <%= username %>
+          </span>
+
+          <form action="/sign_out" method="POST" class="form-inline">
+            <button class="btn btn-outline-light" type="submit">Sign Out</button>
+          </form>
+        <% } else { %>
+
+          <form action="/sign_in" method="POST" class="form-inline">
+            <input class="form-control mr-2" name="username" placeholder="Username">
+            <button class="btn btn-outline-light" type="submit">Sign In</button>
+          </form>
+        <% } %>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container mt-4">

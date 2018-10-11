@@ -1,0 +1,31 @@
+<%- include("../partials/header") %>
+
+<h1>Sign Up</h1>
+<form action="/users" method="POST">
+  <div class="form-group">
+    <input
+      type="text"
+      class="form-control"
+      name="userName"
+      placeholder="Your unique username">
+  </div>
+
+  <div class="form-group">
+    <input
+      type="email"
+      class="form-control"
+      name="email"
+      placeholder="e.g. john@smith.com">
+  </div>
+
+  <div class="form-group">
+    <input
+      type="password"
+      class="form-control"
+      name="password">
+  </div>
+
+  <input type="submit" value="Save" class="btn btn-outline-success">
+</form>
+
+<%- include("../partials/footer") %>

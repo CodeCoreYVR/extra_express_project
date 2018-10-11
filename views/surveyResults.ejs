@@ -1,0 +1,13 @@
+<%- include("./partials/header") %> 
+
+<% if (fullName && color && timeOfDay) { %>
+  <h1 style="color:<%= color %>;">Hi, <%= fullName %>!</h1>
+
+  <p>Your favourite time of day is <%= timeOfDay %>.</p>
+
+  <p>Thanks for filling out our survey. 😄</p>
+<% } else { %>
+  <h1>Please fill out the <a href="/survey">survey!</a></h1>
+<% } %>
+
+<%- include("./partials/footer") %> 

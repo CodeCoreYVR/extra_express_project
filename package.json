@@ -1,0 +1,38 @@
+{
+  "name": "express_demo",
+  "version": "0.0.1",
+  "description": "Class demonstration for building an Express application",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js",
+    "db:create": "createdb -e express_demo",
+    "db:drop": "dropdb -e --if-exists express_demo",
+    "db:migrate": "knex migrate:latest",
+    "db:rollback": "knex migrate:rollback",
+    "db:seed": "knex seed:run",
+    "db:repl": "psql -d express_demo"
+  },
+  "keywords": [
+    "server",
+    "express",
+    "backend"
+  ],
+  "author": "Steve Godin",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^3.0.1",
+    "cookie-parser": "^1.4.3",
+    "ejs": "^2.6.1",
+    "express": "^4.16.3",
+    "express-session": "^1.15.6",
+    "knex": "^0.15.2",
+    "method-override": "^3.0.0",
+    "morgan": "^1.9.0",
+    "pg": "^7.4.3",
+    "socket.io": "^2.1.1"
+  },
+  "devDependencies": {
+    "faker": "^4.1.0",
+    "nodemon": "^1.18.3"
+  }
+}

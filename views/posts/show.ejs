@@ -1,0 +1,115 @@
+<%- include("../partials/header") %>
+
+<script>
+  const socket = io();
+
+  const commentItemEl = comment => h(
+    "li",
+    { class: "list-group-item" },
+    [
+      comment.content,
+      h("br"),
+      h("small", { class: "text-muted" }, comment.createdAt)
+    ]
+  )
+
+  socket.emit("joinRoom", "post<%= post.id %>");
+
+  socket.on("newComment", comment => {
+    console.log("IO Received comment:", comment);
+
+    document
+      .querySelector("#comment-list")
+      .prepend(commentItemEl(comment));
+  })
+  
+  document.addEventListener("DOMContentLoaded", () => {
+    const newCommentForm = document.querySelector("#new-comment");
+  
+    newCommentForm.addEventListener("submit", event => {
+      event.preventDefault();
+      console.log("New comment submitted");
+
+      const form = event.currentTarget;
+      const formData = new FormData(form);
+
+      // Use the `emit` method on a `socket` to trigger a custom event
+      // or, in other words, send a message through the socket.
+
+      // Calling `emit` on the client side means the server is going receive it.
+      // Calling `emit` on the server side means the client is going receive it.
+      socket.emit(
+        "newComment",
+        {
+          content: formData.get("content"),
+          postId: parseInt(formData.get("postId"))
+        }
+      );
+
+      // Use the method `reset` on form nodes to clear the values of all its
+      // input fields.
+      form.reset();
+    });
+  });
+</script>
+
+<div class="card mb-4">
+  <% if (post.imageUrl) { %>
+    <img
+      class="card-img-top"
+      src="<%= post.imageUrl %>"
+      alt="Card image">
+  <% } %>
+  <div class="card-body">
+
+    <h5 class="card-title"><%= post.title %></h5>
+    <p class="card-text">
+      <%= post.content %> <br>
+      <em>Seen <%= post.viewCount %> time(s)</em> •
+      <em>Posted at <%= post.createdAt %></em>
+    </p>
+
+    <div class="d-flex">
+      <a
+        href="/posts/<%= post.id %>/edit"
+        class="btn btn-outline-success mr-2">
+        Edit
+      </a>
+
+      <!-- Forms only support the methods GET and POST. -->
+      <form action="/posts/<%= post.id %>" method="POST">
+        <input
+          type="hidden"
+          name="_method"
+          value="DELETE">
+
+        <input
+          type="submit"
+          value="Delete"
+          class="btn btn-outline-success">
+      </form>
+    </div>
+  </div>
+
+  <form id="new-comment" class="card-body d-flex">
+    <input type="hidden" name="postId" value="<%= post.id %>">
+    <input
+      type="text"
+      name="content"
+      class="form-control mr-2"
+      placeholder="What's on your mind?">
+    <input class="btn btn-outline-success" type="submit" value="Send">
+  </form>
+
+  <ul id="comment-list" class="list-group list-group-flush">
+    <% for (let comment of comments) { %>
+      <li class="list-group-item">
+        <%= comment.content %> <br>
+        <small class="text-muted"><%= comment.createdAt %></small>
+      </li>
+    <% } %>
+  </ul>
+</div>
+
+
+<%- include("../partials/footer") %>
