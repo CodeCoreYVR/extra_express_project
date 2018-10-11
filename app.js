@@ -168,9 +168,6 @@ app.use(async (req, res, next) => {
 
 const indexRouter = require("./routes/index");
 const welcomeRouter = require("./routes/welcome");
-const postsRouter = require("./routes/posts");
-
-app.use("/", indexRouter);
 
 app.use("/", welcomeRouter);
 // You can split routes into their modules with
@@ -178,7 +175,7 @@ app.use("/", welcomeRouter);
 // and connect to the app with app.use(<path-prefix>, <router-instance>).
 // The app.use(...) will route all routes inside of postsRouter
 // prefix all of their URLs with /posts.
-app.use("/posts", postsRouter);
+app.use("/", indexRouter);
 
 // -------------
 // S O C K E T S
