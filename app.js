@@ -22,6 +22,16 @@ const io = socketIo(server);
 
 app.set("view engine", "ejs");
 
+// T E M P L A T E  V A R I A B L E S
+// Initialize errors to an empty array to avoid crashes
+// when there are no validation errors
+app.locals.errors = [];
+
+// H E L P E R S
+const formHelpers = require("./helpers/form");
+
+Object.assign(app.locals, formHelpers);
+
 // app.set('trust proxy', 1) // trust first proxy
 
 // -------------------
