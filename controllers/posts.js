@@ -1,34 +1,69 @@
+const { body, validationResult } = require("express-validator/check");
 const express = require("express");
-const router = express.Router();
 const knex = require("../db/client");
+
+const router = express.Router();
+
+const validatePost = [
+  body("title")
+    .not()
+    .isEmpty()
+    .withMessage("Title must be present")
+    .custom(async title => {
+      if (
+        await knex("posts")
+          .where("title", title)
+          .first()
+      ) {
+        throw new Error("Title must be unique");
+      }
+    }),
+  body("content")
+    .not()
+    .isEmpty()
+    .withMessage("Content must be present"),
+  body("imageUrl")
+    .not()
+    .isEmpty()
+    .withMessage("Image link must be present")
+    .isURL({ require_protocol: true })
+    .withMessage("Image link must be valid URL")
+];
 
 module.exports = {
   new(req, res) {
     if (req.currentUser) {
-      res.render("posts/new");
+      res.render("posts/new", { post: {} });
     } else {
       res.redirect("/");
     }
   },
-  async create(req, res) {
-    // const imageUrl = req.body.imageUrl;
-    // const title = req.body.title;
-    // const content = req.body.content;
-    // 👇 syntax sugar for 👆
-    // Object destructuring
-    const { imageUrl, title, content } = req.body;
 
-    const [id] = await knex("posts")
-      .insert({
-        imageUrl,
-        title,
-        content,
-        viewCount: 0
-      })
-      .returning("id");
+  create: [
+    validatePost,
+    async (req, res) => {
+      const { imageUrl, title, content } = req.body;
+      const errors = validationResult(req);
 
-    res.redirect(`/posts/${id}`);
-  },
+      if (!errors.isEmpty()) {
+        return res.render("posts/new", {
+          post: { imageUrl, title, content },
+          errors: errors.array()
+        });
+      }
+
+      const [id] = await knex("posts")
+        .insert({
+          imageUrl,
+          title,
+          content,
+          viewCount: 0
+        })
+        .returning("id");
+
+      res.redirect(`/posts/${id}`);
+    }
+  ],
   async index(req, res) {
     // knex("posts")
     //   .orderBy("createdAt", "desc")

@@ -11,6 +11,9 @@ const connectRedis = require("connect-redis");
 // Models
 const User = require("./models/user");
 
+// Helpers
+const formHelpers = require("./helpers/form");
+
 // Require the "express" package returns functions that can
 // to create an instance of an Express app. We build
 // an Express by calling a series of methods to configure
@@ -21,6 +24,11 @@ const server = http.Server(app);
 const io = socketIo(server);
 
 app.set("view engine", "ejs");
+
+// APPLY HELPER FUNCTIONS
+
+app.locals.errors = undefined;
+Object.assign(app.locals, formHelpers);
 
 // app.set('trust proxy', 1) // trust first proxy
 
@@ -83,7 +91,7 @@ app.use(cookieParser());
 // all HTTP methods (e.g. GET, POST, DELETE, PUT, PATCH, etc)
 // all URL paths.
 app.use((request, response, next) => {
-  console.log("🍪 Cookies:", request.cookies);
+  // console.log("🍪 Cookies:", request.cookies);
   // Read cookies from the request with `request.cookies`
   // Cookies are represented as object where each key
   // is a cookie name and its value is the cookie's value.
@@ -100,7 +108,7 @@ app.use((request, response, next) => {
 
   if (username) {
     response.locals.username = username;
-    console.log(`🤓 Signed in as ${username}`);
+    // console.log(`🤓 Signed in as ${username}`);
   }
 
   // The third argument, "next", is a function that
@@ -141,7 +149,6 @@ app.use(async (req, res, next) => {
       req.currentUser = user;
       res.locals.currentUser = user; // this makes it accessible in view files
 
-      console.log(user);
       next();
     } catch (error) {
       // If the code above, crashes we're going to take the `error` object and have
