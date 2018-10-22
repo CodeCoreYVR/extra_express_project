@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const knex = require("../db/client");
+const Comment = require("../models/comment");
 
 module.exports = {
   new(req, res) {
@@ -70,9 +71,9 @@ module.exports = {
         .where("id", id)
         .first();
 
-      const comments = await knex("comments")
-        .where("postId", post.id)
-        .orderBy("createdAt", "desc");
+      const comments = await Comment.forPostWithUsers(post.id);
+
+      console.log(comments);
 
       res.render("posts/show", { post, comments });
     } catch (error) {

@@ -7,6 +7,10 @@
     "li",
     { class: "list-group-item" },
     [
+      h("small", {}, [
+        h("strong", {}, `${comment.user.userName} said:`)
+      ]),
+      h("br"),
       comment.content,
       h("br"),
       h("small", { class: "text-muted" }, comment.createdAt)
@@ -104,6 +108,9 @@
   <ul id="comment-list" class="list-group list-group-flush">
     <% for (let comment of comments) { %>
       <li class="list-group-item">
+        <small>
+          <strong><%= comment.user.userName %> said:</strong>
+        </small> <br>
         <%= comment.content %> <br>
         <small class="text-muted"><%= comment.createdAt %></small>
       </li>

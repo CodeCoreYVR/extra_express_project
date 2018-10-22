@@ -211,13 +211,15 @@ io.use(async (socket, next) => {
 
 // .addEventListener
 io.on("connection", socket => {
-  if (socket.currentUser) {
-    console.log(`| IO | ${socket.currentUser.userName} connected`);
+  const { currentUser } = socket;
+
+  if (currentUser) {
+    console.log(`| IO | ${currentUser.userName} connected`);
   }
 
   socket.on("disconnect", reason => {
-    if (socket.currentUser) {
-      console.log(`| IO | ${socket.currentUser.userName} disconnected`);
+    if (currentUser) {
+      console.log(`| IO | ${currentUser.userName} disconnected`);
     }
   });
 
@@ -237,24 +239,29 @@ io.on("connection", socket => {
   // of "newComment". The second argument of the `emit` call will be
   // the first argument that the listener callback receives which is
   // `params` in this case.
-  socket.on("newComment", async params => {
-    console.log("IO Client said:", params);
 
-    const [comment] = await knex("comments")
-      .insert(params)
-      .returning("*");
+  if (currentUser) {
+    socket.on("newComment", async params => {
+      console.log("IO Client said:", params);
 
-    socket.emit("newComment", comment);
-    // Emitting on socket will only send a message through socket.
-    // To send a message to all connected sockets, use the `broadcast`
-    // property. However, this will not send it to the original socket.
-    // socket.broadcast.emit("newComment", comment);
+      const [comment] = await knex("comments")
+        .insert({ ...params, userId: currentUser.id })
+        .returning("*");
 
-    // To emit a message to all sockets in a room (except for the
-    // socket itself), use the `to` method with the name of
-    // a room, then call `emit` as you normally would.
-    socket.to(`post${params.postId}`).emit("newComment", comment);
-  });
+      const payload = { ...comment, user: currentUser };
+
+      socket.emit("newComment", payload);
+      // Emitting on socket will only send a message through socket.
+      // To send a message to all connected sockets, use the `broadcast`
+      // property. However, this will not send it to the original socket.
+      // socket.broadcast.emit("newComment", comment);
+
+      // To emit a message to all sockets in a room (except for the
+      // socket itself), use the `to` method with the name of
+      // a room, then call `emit` as you normally would.
+      socket.to(`post${params.postId}`).emit("newComment", payload);
+    });
+  }
 });
 
 // ------------------
