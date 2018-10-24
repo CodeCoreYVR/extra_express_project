@@ -279,7 +279,7 @@ io.on("connection", socket => {
 // ------------------
 
 const PORT = process.env.PORT || "4545";
-const HOST = "localhost"; // 127.0.0.1
-server.listen(PORT, HOST, () => {
-  console.log(`💻 Server listening on http://${HOST}:${PORT}`);
+// const HOST = "localhost"; // 127.0.0.1
+server.listen(PORT, () => {
+  console.log(`Server listening on ${PORT}`);
 });
