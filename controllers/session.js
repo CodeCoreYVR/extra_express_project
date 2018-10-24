@@ -13,8 +13,10 @@ module.exports = {
       if (user && (await user.authenticate(password))) {
         req.session.userId = user.id;
 
+        req.flash("success", `Welcome back, ${user.userName}!`);
         res.redirect("/");
       } else {
+        req.flash("danger", "Invalid Email or Password");
         res.render("session/new");
       }
     } catch (error) {

@@ -2,7 +2,14 @@ const bcrypt = require("bcrypt");
 const knex = require("../db/client");
 
 class User {
-  constructor({ id, userName, email, password, passwordDigest, createdAt }) {
+  constructor({
+    id,
+    userName,
+    email,
+    password,
+    passwordDigest,
+    createdAt
+  } = {}) {
     this.id = id;
     this.userName = userName;
     this.email = email;
@@ -49,6 +56,8 @@ class User {
   }
 
   async authenticate(password) {
+    if (!password) return false;
+
     return await bcrypt.compare(password, this.passwordDigest);
   }
 }

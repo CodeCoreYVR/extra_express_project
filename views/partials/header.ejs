@@ -61,3 +61,18 @@
   </header>
 
   <main class="container mt-4">
+
+  <%#
+    ...flash = {
+      "success": ["1", "Yo", "Zug ZUg", "Work complete"]
+      "danger": ["1", "Yo", "Zug ZUg", "Work complete"]
+    }
+  %>
+
+  <% for (let type in flash) { %> 
+    <% let msg; while (msg = flash[type].pop()) { %>
+      <div class="<%= `alert alert-${type}` %>">
+        <%= msg %>
+      </div>
+    <% } %>
+  <% } %>

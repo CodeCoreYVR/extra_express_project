@@ -6,6 +6,7 @@ const logger = require("morgan");
 const cookieParser = require("cookie-parser");
 const methodOverride = require("method-override");
 const session = require("express-session");
+const flash = require("connect-flash");
 const connectRedis = require("connect-redis");
 
 // Models
@@ -119,7 +120,7 @@ app.use((request, response, next) => {
   next();
 });
 
-// SESSION
+// S E S S I O N
 // https://devcenter.heroku.com/articles/heroku-redis#connecting-in-node-js
 const RedisStore = connectRedis(session);
 
@@ -141,6 +142,15 @@ const sessionMiddleware = session({
 });
 
 app.use(sessionMiddleware);
+
+// F L A S H
+app.use(flash());
+
+app.use((req, res, next) => {
+  res.locals.flash = req.session.flash;
+
+  next();
+});
 
 // CUSTOM USER AUTH. MIDDLEWARE
 
