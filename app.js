@@ -120,6 +120,7 @@ app.use((request, response, next) => {
 });
 
 // SESSION
+// https://devcenter.heroku.com/articles/heroku-redis#connecting-in-node-js
 const RedisStore = connectRedis(session);
 
 let store = new RedisStore({ port: 6379, host: "localhost" });
