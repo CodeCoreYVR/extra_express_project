@@ -4,7 +4,8 @@
   "description": "Class demonstration for building an Express application",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js",
+    "start": "node app.js",
+    "dev": "nodemon app.js",
     "db:create": "createdb -e express_demo",
     "db:drop": "dropdb -e --if-exists express_demo",
     "db:migrate": "knex migrate:latest",
