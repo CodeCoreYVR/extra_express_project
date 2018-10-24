@@ -26,6 +26,10 @@
       .querySelector("#comment-list")
       .prepend(commentItemEl(comment));
   })
+
+  socket.on("privateMessage", ({ from, content }) => {
+    console.log(`${from.userName} said:`, content);
+  })
   
   document.addEventListener("DOMContentLoaded", () => {
     const newCommentForm = document.querySelector("#new-comment");
@@ -37,15 +41,27 @@
       const form = event.currentTarget;
       const formData = new FormData(form);
 
+      let userName;
+      let content = formData.get("content");
+
+      if (content.startsWith("/msg")) {
+        let toRemove;
+        [toRemove, userName] = /\/msg\s+(\w+)\s/.exec(content);
+        content = content.slice(toRemove.length);
+
+      }
+
       // Use the `emit` method on a `socket` to trigger a custom event
       // or, in other words, send a message through the socket.
 
       // Calling `emit` on the client side means the server is going receive it.
       // Calling `emit` on the server side means the client is going receive it.
+
       socket.emit(
         "newComment",
         {
-          content: formData.get("content"),
+          userName,
+          content,
           postId: parseInt(formData.get("postId"))
         }
       );

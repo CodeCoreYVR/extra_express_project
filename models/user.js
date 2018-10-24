@@ -56,7 +56,7 @@ class User {
   }
 
   async authenticate(password) {
-    if (!password) return false;
+    if (!password || !this.passwordDigest) return false;
 
     return await bcrypt.compare(password, this.passwordDigest);
   }

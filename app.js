@@ -241,6 +241,8 @@ io.on("connection", socket => {
 
   if (currentUser) {
     console.log(`| IO | ${currentUser.userName} connected`);
+
+    socket.join(`user#${currentUser.id}`);
   }
 
   socket.on("disconnect", reason => {
@@ -269,9 +271,23 @@ io.on("connection", socket => {
   if (currentUser) {
     socket.on("newComment", async params => {
       console.log("IO Client said:", params);
+      const { userName, content } = params;
+
+      if (params.userName) {
+        // It's a PM!
+
+        // Find the user we want to PM by their userName
+        const recipient = await knex("users")
+          .where("userName", userName)
+          .first();
+
+        return socket
+          .to(`user#${recipient.id}`)
+          .emit("privateMessage", { from: currentUser, content: content });
+      }
 
       const [comment] = await knex("comments")
-        .insert({ ...params, userId: currentUser.id })
+        .insert({ content, userId: currentUser.id })
         .returning("*");
 
       const payload = { ...comment, user: currentUser };
