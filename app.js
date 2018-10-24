@@ -120,15 +120,20 @@ app.use((request, response, next) => {
 });
 
 // SESSION
-
 const RedisStore = connectRedis(session);
+
+let store = new RedisStore({ port: 6379, host: "localhost" });
+if (process.env.REDIS_URL) {
+  store = new RedisStore({ url: process.env.REDIS_URL });
+}
+
 const sessionMiddleware = session({
   secret: "keyboard cat",
   // Without a `store`, a Express session is lost on restart, because
   // by default the session is saved in memory. In this case, we'll
   // an external db that is extremely fast and is especially tailored
   // for this purpose, Redis, to store our session.
-  store: new RedisStore({ port: 6379, host: "localhost" }),
+  store,
   resave: true,
   saveUninitialized: false,
   cookie: { secure: false, maxAge: 30 * 24 * 60 * 60 * 1000 }
