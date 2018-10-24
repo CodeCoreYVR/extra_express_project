@@ -37,5 +37,8 @@
   "devDependencies": {
     "faker": "^4.1.0",
     "nodemon": "^1.18.3"
+  },
+  "engines": {
+    "node": "10.10.0"
   }
 }
